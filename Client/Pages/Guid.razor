@@ -1,0 +1,33 @@
+﻿@page "/guid"
+@inject HttpClient Http
+
+<PageTitle>Guid generator</PageTitle>
+
+<h1>Guid generator</h1>
+
+<p>Generate a GUID and trim it to your liking.</p>
+
+<p role="status">Guid: @guid</p>
+
+<button class="btn btn-primary" @onclick="Generate">New</button>
+<button class="btn btn-primary" @onclick="ToUpper">ToUpper</button>
+
+
+@code {
+    private string guid = string.Empty;
+
+    protected override void OnInitialized()
+    {
+        Generate();
+    }
+
+    public void Generate()
+    {
+        guid = System.Guid.NewGuid().ToString();
+    }
+
+    public void ToUpper()
+    {
+        guid = guid.ToUpper();
+    }
+}
