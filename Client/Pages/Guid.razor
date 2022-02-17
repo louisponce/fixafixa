@@ -1,5 +1,5 @@
 ﻿@page "/guid"
-@inject HttpClient Http
+@inject ClipboardService ClipboardService
 
 <PageTitle>Guid generator</PageTitle>
 
@@ -7,13 +7,33 @@
 
 <p>Generate a GUID and trim it to your liking.</p>
 
-<p role="status">Guid: @guid</p>
+@*<Card Margin="Margin.Is4.OnY">
+    <CardBody>
+        <CardTitle Size="3">Guid generator</CardTitle>
+        <CardText>
+            Generate a GUID and trim it to your liking.
+        </CardText>
+    </CardBody>
+</Card>*@
+
+<Card>
+    <CardBody>
+        <CardText>@guid</CardText>
+        <Button Margin="Margin.Is2.OnAll" Color="Color.Primary" Clicked="@Generate">New</Button>
+        <Button Margin="Margin.Is2.OnAll" Color="Color.Primary" Clicked="@ToClipboard">To clipboard</Button>
+        <Button Margin="Margin.Is2.OnAll" Color="Color.Primary" Clicked="@ToUpper">Case</Button>
+        <Button Margin="Margin.Is2.OnAll" Color="Color.Primary" Clicked="@RemoveDashes">Remove dashes</Button>
+    </CardBody>
+</Card>
+
+@*<p role="status">Guid: @guid</p>
 
 <button class="btn btn-primary" @onclick="Generate">New</button>
-<button class="btn btn-primary" @onclick="ToUpper">ToUpper</button>
+<button class="btn btn-primary" @onclick="ToUpper">ToUpper</button>*@
 
 
 @code {
+    private bool upper = false;
     private string guid = string.Empty;
 
     protected override void OnInitialized()
@@ -21,13 +41,24 @@
         Generate();
     }
 
-    public void Generate()
+    private void Generate()
     {
         guid = System.Guid.NewGuid().ToString();
     }
 
-    public void ToUpper()
+    private async Task ToClipboard()
     {
-        guid = guid.ToUpper();
+        await ClipboardService.WriteTextAsync(guid);
+    }
+
+    private void ToUpper()
+    {
+        guid = upper ? guid.ToLower() : guid.ToUpper();
+        upper = !upper;
+    }
+
+    private void RemoveDashes()
+    {
+        guid = guid.Replace("-", "");
     }
 }

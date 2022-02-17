@@ -1,0 +1,99 @@
+﻿@page "/baseencoding"
+@using System.IO
+@inject ClipboardService ClipboardService
+@inject Services.BaseEncodingService BaseEncodingService
+
+<PageTitle>Base encoding</PageTitle>
+
+<h1>Base encoding</h1>
+
+<p>Import a file (you can use drag & drop) and get the base64 enconding.</p>
+<p>Paste the content to the clipboard for further use.</p>
+
+<FileEdit Changed="@FileOnChanged" />
+
+<Card Margin="Margin.Is4.OnY">
+    <CardBody>
+        <CardTitle Size="5">Encoded file content</CardTitle>
+        <CardText>@shortContent</CardText>
+    </CardBody>
+</Card>
+
+<Button Color="Color.Primary" Clicked="@ToClipboard">To clipboard @clipboardSizeLabel</Button>
+
+@if (loading)
+{
+    ResetLabels();
+    SetPageProgressIndeterminate();
+}
+else
+{
+    SetPageProgressHidden();
+}
+
+@code {
+    private const long maxFileSize = 1024 * 1024 * 5; // 5 MB
+    private bool loading;
+    private string content = string.Empty;
+    private string shortContent = "Empty";
+    private string clipboardSizeLabel = string.Empty;
+    [Inject] IPageProgressService PageProgressService { get; set; }
+
+    private async Task FileOnChanged(FileChangedEventArgs e)
+    {
+        loading = true;
+        if (e.Files.Count() == 0)
+        {
+            return;
+        }
+        content = await BaseEncodingService.ToBase64String(e.Files[0].OpenReadStream(maxFileSize));
+        if (content.Length > 50)
+        {
+            shortContent = $"{content.Substring(1, 50)}...";
+        } else
+        {
+            shortContent = content;
+        }
+        var lengthFormatted = string.Format("{0:### ### ##0}", content.Length);
+        clipboardSizeLabel = $"({lengthFormatted} chars)";
+        loading = false;
+    }
+
+    private async Task ToClipboard()
+    {
+        loading = true;
+        await ClipboardService.WriteTextAsync(content);
+        loading = false;
+    }
+
+    private void ResetLabels()
+    {
+        shortContent = "Empty";
+        clipboardSizeLabel = string.Empty;
+    }
+
+    Task SetPageProgressIndeterminate()
+    {
+        return PageProgressService.Go( null, options => { options.Color = Color.Info; } );
+    }
+
+    Task SetPageProgressHidden()
+    {
+        // setting it to -1 will hide the progress bar
+        return PageProgressService.Go( -1 );
+    }
+
+    //private Modal modalRef = new();
+
+    //private Task ShowModal()
+    //{
+    //    return modalRef.Show();
+    //}
+
+    //private Task HideModal()
+    //{
+    //    return modalRef.Hide();
+    //}
+
+
+}
