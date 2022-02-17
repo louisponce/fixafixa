@@ -1,5 +1,5 @@
 ﻿using Microsoft.JSInterop;
-namespace Client
+namespace Client.Services
 {
     public class ClipboardService
     {
@@ -16,3 +16,4 @@ namespace Client
         }
     }
 }
+

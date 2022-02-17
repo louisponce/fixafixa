@@ -1,0 +1,44 @@
+﻿@page "/azurefunctiondemo"
+@inject HttpClient Http
+
+<PageTitle>Azure Function Demo</PageTitle>
+
+<h3>Azure Function Demo</h3>
+
+<p>This component calls an Azure Function on the server to retrieve sample data.</p>
+
+@if (people is null)
+{
+    <p><em>Loading...</em></p>
+}
+else
+{
+    <table class="table">
+        <thead>
+            <tr>
+                <th>Name</th>
+                <th>Last Name</th>
+                <th>Email</th>
+            </tr>
+        </thead>
+        <tbody>
+            @foreach (var p in people)
+            {
+                <tr>
+                    <td>@p.FirstName</td>
+                    <td>@p.LastName</td>
+                    <td>@p.Email</td>
+                </tr>
+            }
+        </tbody>
+    </table>
+}
+
+@code {
+    private SharedGlobal.Person[]? people;
+
+    protected override async Task OnInitializedAsync()
+    {
+        people = await Http.GetFromJsonAsync<SharedGlobal.Person[]>("/api/DemoFunction");
+    }
+}

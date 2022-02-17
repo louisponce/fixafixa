@@ -21,7 +21,7 @@ builder.Services
 
 
 // Clipboard
-builder.Services.AddScoped<Client.ClipboardService>();
+builder.Services.AddScoped<Client.Services.ClipboardService>();
 // BaseEncoding
 builder.Services.AddScoped<Client.Services.BaseEncodingService>();
 
@@ -29,6 +29,7 @@ builder.Services.AddScoped<Client.Services.BaseEncodingService>();
 builder.RootComponents.Add<App>("#app");
 builder.RootComponents.Add<HeadOutlet>("head::after");
 
-builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+//builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.HostEnvironment.BaseAddress) });
+builder.Services.AddScoped(sp => new HttpClient { BaseAddress = new Uri(builder.Configuration["API_Prefix"] ?? builder.HostEnvironment.BaseAddress) });
 
 await builder.Build().RunAsync();
